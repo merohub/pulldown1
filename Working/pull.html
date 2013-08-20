@@ -1,0 +1,177 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>jQM - Dynamically Populate Listview from JSON - jsFiddle demo by Gajotres</title>
+     <meta name="viewport" content="width=device-width"/>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+    <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>    
+  <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.3.js'></script>
+<script type="text/javascript" src="js/iscroll.js"></script>
+  <style type='text/css'>
+    li span {
+font-weight: normal;
+}
+
+  </style>
+  
+<script type='text/javascript'>//<![CDATA[ 
+$(function(){
+    $(document).on('pagebeforeshow', '#home', function(){      
+        $.ajax({url: "http://localhost/PullUpRefresh/news.json",
+            dataType: "json",
+            async: true,
+            success: function (result) {
+                ajax.parseJSON(result);
+            },
+            error: function (request,error) {
+                alert('Network error has occurred please try again!');
+            }
+        });         
+    });
+    
+    
+    var ajax = {  
+        parseJSON:function(result){
+            $.each( result, function(i, row) {
+                $('#movie-data').append('<li>' + row.original_name + row.overview+ '</li>');
+            });
+            $('#movie-data').listview('refresh');
+        }
+    }
+
+});//]]>  
+
+</script>
+
+
+</head>
+<body>
+  <!DOCTYPE html>
+<html>
+<head>
+    <title>jQM Complex Demo</title>
+    <meta name="viewport" content="width=device-width"/>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
+    <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>    
+</head>
+<body>
+    <div data-role="page" id="home">
+        <div data-theme="a" data-role="header">
+            <h3>
+                Movie Info
+                <a href="#" class="alt" onclick="refreshPage()">Refresh</a>
+            </h3>
+        </div>        
+       
+
+<div id="wrapper">
+    <div id="scroller">
+        <div id="pullDown">
+            <span class="pullDownIcon"></span><span class="pullDownLabel">Pull down to refresh...</span>
+        </div>
+
+        <div data-role="content">
+             
+     
+        <ul data-role="listview"  id="movie-data" data-theme="a">
+
+            </ul> 
+        </div>
+        <div id="pullUp">
+            <span class="pullUpIcon"></span><span class="pullUpLabel">Pull up to refresh...</span>
+        </div>
+    </div>
+</div>
+  
+</body>
+
+
+</html>
+
+<!--
+<script type="text/javascript">
+
+function refreshPage()
+{
+  setTimeout("window.location.reload();",5000);
+}
+
+
+</script>
+
+-->
+
+<script type="text/javascript">
+
+var myScroll,
+    pullDownEl, pullDownOffset,
+    pullUpEl, pullUpOffset,
+    generatedCount = 0;
+
+function pullDownAction () {
+    setTimeout("window.location.reload();",3000);
+}
+
+function pullUpAction () {
+   setTimeout("window.location.reload();",3000);
+}
+
+function loaded() {
+    pullDownEl = document.getElementById('pullDown');
+    pullDownOffset = pullDownEl.offsetHeight;
+    pullUpEl = document.getElementById('pullUp');   
+    pullUpOffset = pullUpEl.offsetHeight;
+    
+    myScroll = new iScroll('wrapper', {
+        useTransition: true,
+        topOffset: pullDownOffset,
+        onRefresh: function () {
+            if (pullDownEl.className.match('loading')) {
+                pullDownEl.className = '';
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh...';
+            } else if (pullUpEl.className.match('loading')) {
+                pullUpEl.className = '';
+                pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Pull up to load more...';
+            }
+        },
+        onScrollMove: function () {
+            if (this.y > 5 && !pullDownEl.className.match('flip')) {
+                pullDownEl.className = 'flip';
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Release to refresh...';
+                this.minScrollY = 0;
+            } else if (this.y < 5 && pullDownEl.className.match('flip')) {
+                pullDownEl.className = '';
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh...';
+                this.minScrollY = -pullDownOffset;
+            } else if (this.y < (this.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
+                pullUpEl.className = 'flip';
+                pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Release to refresh...';
+                this.maxScrollY = this.maxScrollY;
+            } //else if (this.y > (this.maxScrollY + 5) && pullUpEl.className.match('flip')) {
+                //pullUpEl.className = '';
+                //pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Pull up to load more...';
+                //this.maxScrollY = pullUpOffset;
+           // }
+        },
+        onScrollEnd: function () {
+            if (pullDownEl.className.match('flip')) {
+                pullDownEl.className = 'loading';
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Loading...';                
+                pullDownAction();   // Execute custom function (ajax call?)
+            } else if (pullUpEl.className.match('flip')) {
+                pullUpEl.className = 'loading';
+                pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Loading...';                
+                pullUpAction(); // Execute custom function (ajax call?)
+            }
+        }
+    });
+    
+    setTimeout(function () { document.getElementById('wrapper').style.left = '0'; }, 800);
+}
+
+document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+
+document.addEventListener('DOMContentLoaded', function () { setTimeout(loaded, 200); }, false);
+</script>
