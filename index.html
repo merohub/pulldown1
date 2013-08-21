@@ -1,23 +1,42 @@
+
 <!DOCTYPE html>
 <html>
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <title>Pull refresh</title>
-     <meta name="viewport" content="width=device-width"/>
+  <title>jQM - Dynamically Populate Listview from JSON - jsFiddle demo by Gajotres</title>
   
   <script type='text/javascript' src='http://code.jquery.com/jquery-1.8.3.js'></script>
-<script type="text/javascript" src="js/iscroll.js"></script>
+  <link rel="stylesheet" type="text/css" href="/css/normalize.css">
+  
+  
+  <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+  
   <style type='text/css'>
     li span {
 font-weight: normal;
 }
 
+  
+ 
+        .scrollable {
+            overflow-y: scroll;
+            -webkit-overflow-scrolling: touch;
+        }
+ 
+            /* iOS specific fix, don't use it on Android devices */
+        .scrollable > * {
+            -webkit-transform: translateZ(0px);
+        }
+    </style>
+
   </style>
   
+
+
 <script type='text/javascript'>//<![CDATA[ 
 $(function(){
     $(document).on('pagebeforeshow', '#home', function(){      
-        $.ajax({url: "http://hitlarrajbhandari.com/news.json",
+        $.ajax({url: "http://localhost/ihp5/news.json",
             dataType: "json",
             async: true,
             success: function (result) {
@@ -53,54 +72,55 @@ $(function(){
     <meta name="viewport" content="width=device-width"/>
     <link rel="stylesheet" href="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.css" />
     <script src="http://code.jquery.com/mobile/1.2.0/jquery.mobile-1.2.0.min.js"></script>    
+    <script type="text/javascript" src="js/iscroll.js"></script>
 </head>
 <body>
     <div data-role="page" id="home">
         <div data-theme="a" data-role="header">
             <h3>
                 Movie Info
-                
+                <a href="#" class="alt" onclick="refreshPage()">Refresh</a>
             </h3>
-        </div>        
-       
+        </div>  
 
 <div id="wrapper">
     <div id="scroller">
         <div id="pullDown">
-            <span class="pullDownIcon"></span><span class="pullDownLabel">Release to update...</span>
+            <span class="pullDownIcon"></span><span class="pullDownLabel">Pull down to refresh...</span>
         </div>
 
-        <div data-role="content">
-             
-        <ul data-role="listview"  id="movie-data" data-theme="a">
-            </ul> 
-        </div><!--data role-content-->
 
-        <div id="pullUp">
-            <span class="pullUpIcon"></span><span class="pullUpLabel"></span>
+        <div data-role="content" class="scrollable">
+            <ul data-role="listview"  id="movie-data" data-theme="a">
+
+            </ul>
         </div>
-    </div><!--scroller-->
-</div><!--wrapper-->
 
-</div>
+ <div id="pullUp">
+            <span class="pullUpIcon"></span><span class="pullUpLabel">Pull up to refresh...</span>
+        </div>
+
+    </div>
+</body>
+</html>    
   
 </body>
 
 
 </html>
 
-<!--
+
 <script type="text/javascript">
 
 function refreshPage()
 {
+
   setTimeout("window.location.reload();",5000);
 }
 
 
 </script>
 
--->
 
 <script type="text/javascript">
 
@@ -129,24 +149,24 @@ function loaded() {
         onRefresh: function () {
             if (pullDownEl.className.match('loading')) {
                 pullDownEl.className = '';
-                pullDownEl.querySelector('.pullDownLabel').innerHTML = '';
-            } //else if (pullUpEl.className.match('loading')) {
-                //pullUpEl.className = '';
-               // pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Pull up to load more...';
-           // }
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh...';
+            } else if (pullUpEl.className.match('loading')) {
+                pullUpEl.className = '';
+                pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Pull up to load more...';
+            }
         },
         onScrollMove: function () {
             if (this.y > 5 && !pullDownEl.className.match('flip')) {
                 pullDownEl.className = 'flip';
-               // pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Release to update...';
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Release to refresh...';
                 this.minScrollY = 0;
             } else if (this.y < 5 && pullDownEl.className.match('flip')) {
                 pullDownEl.className = '';
-                pullDownEl.querySelector('.pullDownLabel').innerHTML = '';
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Pull down to refresh...';
                 this.minScrollY = -pullDownOffset;
             } else if (this.y < (this.maxScrollY - 5) && !pullUpEl.className.match('flip')) {
                 pullUpEl.className = 'flip';
-                pullUpEl.querySelector('.pullUpLabel').innerHTML = '';
+                pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Release to refresh...';
                 this.maxScrollY = this.maxScrollY;
             } //else if (this.y > (this.maxScrollY + 5) && pullUpEl.className.match('flip')) {
                 //pullUpEl.className = '';
@@ -157,11 +177,11 @@ function loaded() {
         onScrollEnd: function () {
             if (pullDownEl.className.match('flip')) {
                 pullDownEl.className = 'loading';
-                pullDownEl.querySelector('.pullDownLabel').innerHTML = '<img src="images/loading.gif" />';                
+                pullDownEl.querySelector('.pullDownLabel').innerHTML = 'Loading...';                
                 pullDownAction();   // Execute custom function (ajax call?)
             } else if (pullUpEl.className.match('flip')) {
                 pullUpEl.className = 'loading';
-                pullUpEl.querySelector('.pullUpLabel').innerHTML = '<img src="images/loading.gif;" />';                
+                pullUpEl.querySelector('.pullUpLabel').innerHTML = 'Loading...';                
                 pullUpAction(); // Execute custom function (ajax call?)
             }
         }
